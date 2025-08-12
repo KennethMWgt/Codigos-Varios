@@ -1,0 +1,4 @@
+Juan,ventas,2000
+Maria,marketing,2500
+Pedro,ventas,2800
+Laura,finanzas,3000

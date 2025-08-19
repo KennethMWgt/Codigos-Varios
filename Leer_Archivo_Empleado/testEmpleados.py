@@ -6,7 +6,7 @@ class TestEmpleados(unittest.TestCase):
 
     def setUp(self):
         # Preparamos un archivo de prueba en memoria (puedes ajustar según lo necesario)
-        self.empleados_data = leer_empleados('empleados.txt')
+        self.empleados_data = leer_empleados('Leer_Archivo_Empleado\empleados.txt')
 
     def test_salario_promedio(self):
         promedio = salario_promedio(self.empleados_data)

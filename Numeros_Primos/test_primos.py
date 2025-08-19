@@ -1,5 +1,5 @@
 import unittest
-from tarea_primos import es_primo 
+from Numeros_Primos.tarea_primos import es_primo 
 
 class TestEsPrimo(unittest.TestCase):
     

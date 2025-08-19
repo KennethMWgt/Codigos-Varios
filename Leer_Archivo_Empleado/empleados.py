@@ -33,6 +33,6 @@ def mostrar_resultados(empleados):
 
 # Si este script se ejecuta directamente
 if __name__ == "__main__":
-    archivo = 'Leer_Archivo_Empleado\empleados.txt'  # Nombre del archivo
+    archivo = 'Leer_Archivo_Empleado/empleados.txt'  # Nombre del archivo
     empleados = leer_empleados(archivo)
     mostrar_resultados(empleados)

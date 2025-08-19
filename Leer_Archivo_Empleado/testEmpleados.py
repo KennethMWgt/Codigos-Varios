@@ -1,6 +1,6 @@
 # test_empleados.py
 import unittest
-from Leer_Archivo_Empleado.empleados import leer_empleados, salario_promedio, empleado_mas_ganador
+from empleados import leer_empleados, salario_promedio, empleado_mas_ganador
 
 class TestEmpleados(unittest.TestCase):
 

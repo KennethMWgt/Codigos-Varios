@@ -46,14 +46,14 @@ def ejecutar():
 
     while True:
         producto = input("\nIngrese el producto (o 'salir' para terminar)(+ actualizar stock): ").lower()
+        flag_agregar = False
         if producto == "salir":
             break
         if producto == "+":
-            newproducto = input("\nIngrese el producto:").lower()
-            nueva_cantidad2 = int(input(f"Ingrese la cantidad para '{newproducto}': "))
-            agregar_producto(newproducto, nueva_cantidad2)
-            producto = newproducto
-            cantidad = 0
+            producto = input("\nIngrese el producto:").lower()
+            nueva_cantidad2 = int(input(f"Ingrese la cantidad para '{producto}': "))
+            agregar_producto(producto, nueva_cantidad2)
+            flag_agregar = True
 
         if producto not in stock:
             respuesta = input(f"El producto '{producto}' no existe. ¿Desea agregarlo? (s/n): ").lower()
@@ -70,12 +70,12 @@ def ejecutar():
                 continue
 
         try:
-            if producto != newproducto: 
+            if not flag_agregar: 
                 cantidad = int(input("Ingrese la cantidad: "))
         except ValueError:
             print("Debe ingresar un número válido.")
             continue
-        if producto != newproducto:
+        if not flag_agregar: 
             print(verificar_stock(producto, cantidad))
     
     print("\nInventario final:", stock)

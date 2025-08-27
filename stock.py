@@ -18,7 +18,7 @@ def agregar_producto(producto: str, cantidad: int):
     stock[producto] = cantidad
     print(f"Producto '{producto}' agregado con {cantidad} unidades.")
 
-def actualizar_stock(producto: str, cantidad: int) -> str:
+def verificar_stock(producto: str, cantidad: int) -> str:
     """
     Valida si hay suficiente inventario y actualiza el stock.
     Retorna un mensaje con el resultado.
@@ -46,15 +46,14 @@ def ejecutar():
 
     while True:
         producto = input("\nIngrese el producto (o 'salir' para terminar)(+ actualizar stock): ").lower()
-        newproducto = producto
+        flag_agregar = False
         if producto == "salir":
             break
         if producto == "+":
-            newproducto = input("\nIngrese el producto:").lower()
-            nueva_cantidad2 = int(input(f"Ingrese la cantidad para '{newproducto}': "))
-            agregar_producto(newproducto, nueva_cantidad2)
-            producto = newproducto
-            cantidad = 0
+            producto = input("\nIngrese el producto:").lower()
+            nueva_cantidad2 = int(input(f"Ingrese la cantidad para '{producto}': "))
+            agregar_producto(producto, nueva_cantidad2)
+            continue
 
         if producto not in stock:
             respuesta = input(f"El producto '{producto}' no existe. ¿Desea agregarlo? (s/n): ").lower()
@@ -63,7 +62,6 @@ def ejecutar():
                     nueva_cantidad = int(input(f"Ingrese la cantidad para '{producto}': "))
                     agregar_producto(producto, nueva_cantidad)
                     print("\nNuevo Inventario:", stock)
-                    newproducto = producto
                 except ValueError:
                     print("Cantidad inválida. Debe ser un número entero.")
                 continue
@@ -72,13 +70,11 @@ def ejecutar():
                 continue
 
         try:
-            if producto != newproducto: 
-                cantidad = int(input("Ingrese la cantidad: "))
+            cantidad = int(input("Ingrese la cantidad: "))
         except ValueError:
             print("Debe ingresar un número válido.")
             continue
-        if producto != newproducto:
-            print(verificar_stock(producto, cantidad))
+        print(verificar_stock(producto, cantidad))
     
     print("\nInventario final:", stock)
 

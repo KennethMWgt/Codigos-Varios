@@ -18,7 +18,7 @@ def agregar_producto(producto: str, cantidad: int):
     stock[producto] = cantidad
     print(f"Producto '{producto}' agregado con {cantidad} unidades.")
 
-def verificar_stock(producto: str, cantidad: int) -> str:
+def actualizar_stock(producto: str, cantidad: int) -> str:
     """
     Valida si hay suficiente inventario y actualiza el stock.
     Retorna un mensaje con el resultado.
@@ -46,7 +46,6 @@ def ejecutar():
 
     while True:
         producto = input("\nIngrese el producto (o 'salir' para terminar)(+ actualizar stock): ").lower()
-        flag_agregar = False
         if producto == "salir":
             break
         if producto == "+":
@@ -74,7 +73,7 @@ def ejecutar():
         except ValueError:
             print("Debe ingresar un número válido.")
             continue
-        print(verificar_stock(producto, cantidad))
+        print(actualizar_stock(producto, cantidad))
     
     print("\nInventario final:", stock)
 

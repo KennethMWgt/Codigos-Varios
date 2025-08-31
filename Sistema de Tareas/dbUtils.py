@@ -14,7 +14,7 @@ def create_tables(conn: sqlite3.Connection) -> None:
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
-            done INTEGER NOT NULL DEFAULT 0,
+            is_done INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
     """)
@@ -33,7 +33,7 @@ def update_task(conn: sqlite3.Connection, task_id: int, title: str = None, done:
         sets.append("title = ?")
         params.append(title)
     if done is not None:
-        sets.append("done = ?")
+        sets.append("is_done = ?")
         params.append(int(done))
 
     if not sets:
@@ -49,6 +49,10 @@ def delete_task(conn: sqlite3.Connection, task_id: int) -> int:
     cur = conn.execute("DELETE FROM tasks WHERE id = ?;", (task_id,))
     conn.commit()
     return cur.rowcount
+
+def get_all_tasks(conn: sqlite3.Connection):
+    cur = conn.execute("SELECT id, title, is_done, created_at FROM tasks ORDER BY id;")
+    return cur.fetchall()
 
 # --- Ejemplo de uso
 #if __name__ == "__main__":

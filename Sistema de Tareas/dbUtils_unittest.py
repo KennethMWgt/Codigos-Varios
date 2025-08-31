@@ -14,7 +14,7 @@ class SQLiteTasksTestCase(unittest.TestCase):
         self.conn.close()
 
     def fetch_all(self):
-        cur = self.conn.execute("SELECT id, title, done, created_at FROM tasks ORDER BY id;")
+        cur = self.conn.execute("SELECT id, title, is_done, created_at FROM tasks ORDER BY id;")
         return cur.fetchall()
 
     def test_create_tables_is_idempotent(self):
@@ -29,7 +29,7 @@ class SQLiteTasksTestCase(unittest.TestCase):
         row = rows[0]
         self.assertEqual(row["id"], tid)
         self.assertEqual(row["title"], "Buy milk")
-        self.assertEqual(row["done"], 0)
+        self.assertEqual(row["is_done"], 0)
         self.assertIsNotNone(row["created_at"])
 
     def test_update_title_and_done(self):
@@ -39,18 +39,18 @@ class SQLiteTasksTestCase(unittest.TestCase):
         self.assertEqual(count, 1)
         row = self.fetch_all()[0]
         self.assertEqual(row["title"], "Updated title")
-        self.assertEqual(row["done"], 0)
+        self.assertEqual(row["is_done"], 0)
 
         count = update_task(self.conn, tid, done=1)
         self.assertEqual(count, 1)
         row = self.fetch_all()[0]
-        self.assertEqual(row["done"], 1)
+        self.assertEqual(row["is_done"], 1)
 
         count = update_task(self.conn, tid, title="Final title", done=0)
         self.assertEqual(count, 1)
         row = self.fetch_all()[0]
         self.assertEqual(row["title"], "Final title")
-        self.assertEqual(row["done"], 0)
+        self.assertEqual(row["is_done"], 0)
 
     def test_update_with_no_fields_returns_zero(self):
         tid = insert_task(self.conn, "No-op")
@@ -58,7 +58,7 @@ class SQLiteTasksTestCase(unittest.TestCase):
         self.assertEqual(count, 0)
         row = self.fetch_all()[0]
         self.assertEqual(row["title"], "No-op")
-        self.assertEqual(row["done"], 0)
+        self.assertEqual(row["is_done"], 0)
 
     def test_delete_existing_and_nonexistent(self):
         tid = insert_task(self.conn, "To delete")

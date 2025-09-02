@@ -1,20 +1,36 @@
 import sqlite3
 
+import sqlite3
+
 DB_FILE = "todo.db"
+_test_conn: sqlite3.Connection | None = None  # conexión de prueba (si está seteada)
 
 
 def get_conn(db_file: str = DB_FILE) -> sqlite3.Connection:
-    """Crea y retorna una conexión a la base SQLite."""
+    """Devuelve la conexión: la real o la inyectada en test."""
+    global _test_conn
+    if _test_conn is not None:
+        return _test_conn
     conn = sqlite3.connect(db_file)
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
+
+
+def override_conn_for_tests(conn: sqlite3.Connection | None) -> None:
+    """Permite inyectar una conexión (ej. en tests con :memory:)."""
+    global _test_conn
+    _test_conn = conn
+
+
+def _should_close_conn(conn: sqlite3.Connection) -> bool:
+    """Indica si el wrapper debe cerrar la conexión."""
+    return _test_conn is None or conn is not _test_conn
 
 
 def create_tables() -> None:
     """Elimina y vuelve a crear la tabla de tareas."""
     conn = get_conn()
     try:
-        # 🔴 Ojo: esto borra TODOS los datos previos
         conn.execute("DROP TABLE IF EXISTS tasks;")
         conn.execute("""
             CREATE TABLE tasks (
@@ -27,7 +43,8 @@ def create_tables() -> None:
         conn.commit()
         print("La tabla tasks se eliminó y volvió a crear")
     finally:
-        conn.close()
+        if _should_close_conn(conn):
+            conn.close()
 
 
 def insert_task(title: str) -> int:
@@ -38,7 +55,8 @@ def insert_task(title: str) -> int:
         conn.commit()
         return cur.lastrowid
     finally:
-        conn.close()
+        if _should_close_conn(conn):
+            conn.close()
 
 
 def update_task(task_id: int, title: str = None, done: int = None) -> int:
@@ -61,7 +79,8 @@ def update_task(task_id: int, title: str = None, done: int = None) -> int:
         conn.commit()
         return cur.rowcount
     finally:
-        conn.close()
+        if _should_close_conn(conn):
+            conn.close()
 
 
 def delete_task(task_id: int) -> int:
@@ -72,7 +91,8 @@ def delete_task(task_id: int) -> int:
         conn.commit()
         return cur.rowcount
     finally:
-        conn.close()
+        if _should_close_conn(conn):
+            conn.close()
 
 
 def get_all_tasks():
@@ -82,7 +102,8 @@ def get_all_tasks():
         cur = conn.execute("SELECT id, title, is_done, created_at FROM tasks ORDER BY id;")
         return cur.fetchall()
     finally:
-        conn.close()
+        if _should_close_conn(conn):
+            conn.close()
 
 # --- Ejemplo de uso
 #if __name__ == "__main__":

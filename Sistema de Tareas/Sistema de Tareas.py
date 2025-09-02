@@ -62,7 +62,7 @@ def main():
             except ValueError:
                 print("Por favor, ingresa un número válido.")
         elif opcion == "4":
-             create_tables(conn)
+             create_tables()
         elif opcion == "5":
             ver_tareas()
             try:

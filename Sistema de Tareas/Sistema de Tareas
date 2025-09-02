@@ -7,7 +7,8 @@ def mostrar_menu():
     print("2. Agregar tarea")
     print("3. Eliminar tarea")
     print("4. Crear base de datos")
-    print("5. Salir")
+    print("5. Modificar Titulo")
+    print("6. Salir")
     
 
 def ver_tareas():
@@ -28,13 +29,20 @@ def agregar_tarea(nueva_tarea):
     else:
         print("La tarea no puede estar vacía.")
 
-def eliminar_tarea(tareas, indice):
-    if 0 <= indice < len(tareas):
-        tarea_eliminada = tareas.pop(indice)
-        print(f"Tarea '{tarea_eliminada}' eliminada.")
+def eliminar_tarea(indice):
+    filas = delete_task(conn, indice)
+    if filas > 0:
+        print(f"Tarea '{indice}' eliminada.")
     else:
         print("Índice inválido.")
 
+def modificar_tarea(indice, title):
+    filas = update_task(conn, indice, title)
+    if filas > 0:
+        print(f"Tarea '{indice}' modificada.")
+    else:
+        print("Índice inválido.")
+        
 def main():
     tareas = []
     while True:
@@ -47,15 +55,26 @@ def main():
             nueva = input("Escribe la nueva tarea: ")
             agregar_tarea(nueva)
         elif opcion == "3":
-            ver_tareas(tareas)
+            ver_tareas()
             try:
-                indice = int(input("Número de tarea a eliminar: ")) - 1
-                eliminar_tarea(tareas, indice)
+                indice = int(input("Número de tarea a eliminar: "))
+                eliminar_tarea(indice)
             except ValueError:
                 print("Por favor, ingresa un número válido.")
         elif opcion == "4":
              create_tables(conn)
         elif opcion == "5":
+            ver_tareas()
+            try:
+                indice = int(input("Número de tarea a modificar: "))
+                title = str(input("Ingrese el nuevo titulo de la tarea: "))
+                if title != "":
+                    modificar_tarea(indice, title)
+                else:
+                    print("ingrese el titulo. Intenta de nuevo.")
+            except ValueError:
+                print("Por favor, ingresa un número válido.")
+        elif opcion == "6":
             print("¡Hasta luego!")
             break
         else:

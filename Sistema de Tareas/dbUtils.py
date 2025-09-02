@@ -2,16 +2,22 @@ import sqlite3
 
 DB_FILE = "todo.db"
 
+
 def get_conn(db_file: str = DB_FILE) -> sqlite3.Connection:
     """Crea y retorna una conexión a la base SQLite."""
     conn = sqlite3.connect(db_file)
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
-def create_tables(conn: sqlite3.Connection) -> None:
-    """Crea la tabla de tareas si no existe."""
+def create_tables() -> None:
+    """Elimina y vuelve a crear la tabla de tareas."""
+    conn = get_conn()
+
+    # 🔴 Ojo: esto borra TODOS los datos previos
+    conn.execute("DROP TABLE IF EXISTS tasks;")
+
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS tasks (
+        CREATE TABLE tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             is_done INTEGER NOT NULL DEFAULT 0,
@@ -19,14 +25,16 @@ def create_tables(conn: sqlite3.Connection) -> None:
         );
     """)
     conn.commit()
+    print("La tabla tasks se elimino y volvio a crear")
 
-def insert_task(conn: sqlite3.Connection, title: str) -> int:
+def insert_task(title: str) -> int:
     """Inserta una tarea nueva y retorna el id generado."""
+    conn = get_conn()
     cur = conn.execute("INSERT INTO tasks (title) VALUES (?);", (title,))
     conn.commit()
     return cur.lastrowid
 
-def update_task(conn: sqlite3.Connection, task_id: int, title: str = None, done: int = None) -> int:
+def update_task(task_id: int, title: str = None, done: int = None) -> int:
     """Actualiza título y/o estado de una tarea. Retorna # de filas afectadas."""
     sets, params = [], []
     if title is not None:
@@ -40,17 +48,20 @@ def update_task(conn: sqlite3.Connection, task_id: int, title: str = None, done:
         return 0  # nada que actualizar
 
     params.append(task_id)
+    conn = get_conn()
     cur = conn.execute(f"UPDATE tasks SET {', '.join(sets)} WHERE id = ?;", params)
     conn.commit()
     return cur.rowcount
 
-def delete_task(conn: sqlite3.Connection, task_id: int) -> int:
+def delete_task(task_id: int) -> int:
     """Elimina una tarea por id. Retorna # de filas eliminadas."""
+    conn = get_conn()
     cur = conn.execute("DELETE FROM tasks WHERE id = ?;", (task_id,))
     conn.commit()
     return cur.rowcount
 
-def get_all_tasks(conn: sqlite3.Connection):
+def get_all_tasks():
+    conn = get_conn()
     cur = conn.execute("SELECT id, title, is_done, created_at FROM tasks ORDER BY id;")
     return cur.fetchall()
 

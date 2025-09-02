@@ -9,30 +9,37 @@ def get_conn(db_file: str = DB_FILE) -> sqlite3.Connection:
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
+
 def create_tables() -> None:
     """Elimina y vuelve a crear la tabla de tareas."""
     conn = get_conn()
+    try:
+        # 🔴 Ojo: esto borra TODOS los datos previos
+        conn.execute("DROP TABLE IF EXISTS tasks;")
+        conn.execute("""
+            CREATE TABLE tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                is_done INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+        """)
+        conn.commit()
+        print("La tabla tasks se eliminó y volvió a crear")
+    finally:
+        conn.close()
 
-    # 🔴 Ojo: esto borra TODOS los datos previos
-    conn.execute("DROP TABLE IF EXISTS tasks;")
-
-    conn.execute("""
-        CREATE TABLE tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            is_done INTEGER NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        );
-    """)
-    conn.commit()
-    print("La tabla tasks se elimino y volvio a crear")
 
 def insert_task(title: str) -> int:
     """Inserta una tarea nueva y retorna el id generado."""
     conn = get_conn()
-    cur = conn.execute("INSERT INTO tasks (title) VALUES (?);", (title,))
-    conn.commit()
-    return cur.lastrowid
+    try:
+        cur = conn.execute("INSERT INTO tasks (title) VALUES (?);", (title,))
+        conn.commit()
+        return cur.lastrowid
+    finally:
+        conn.close()
+
 
 def update_task(task_id: int, title: str = None, done: int = None) -> int:
     """Actualiza título y/o estado de una tarea. Retorna # de filas afectadas."""
@@ -49,21 +56,33 @@ def update_task(task_id: int, title: str = None, done: int = None) -> int:
 
     params.append(task_id)
     conn = get_conn()
-    cur = conn.execute(f"UPDATE tasks SET {', '.join(sets)} WHERE id = ?;", params)
-    conn.commit()
-    return cur.rowcount
+    try:
+        cur = conn.execute(f"UPDATE tasks SET {', '.join(sets)} WHERE id = ?;", params)
+        conn.commit()
+        return cur.rowcount
+    finally:
+        conn.close()
+
 
 def delete_task(task_id: int) -> int:
     """Elimina una tarea por id. Retorna # de filas eliminadas."""
     conn = get_conn()
-    cur = conn.execute("DELETE FROM tasks WHERE id = ?;", (task_id,))
-    conn.commit()
-    return cur.rowcount
+    try:
+        cur = conn.execute("DELETE FROM tasks WHERE id = ?;", (task_id,))
+        conn.commit()
+        return cur.rowcount
+    finally:
+        conn.close()
+
 
 def get_all_tasks():
+    """Obtiene todas las tareas."""
     conn = get_conn()
-    cur = conn.execute("SELECT id, title, is_done, created_at FROM tasks ORDER BY id;")
-    return cur.fetchall()
+    try:
+        cur = conn.execute("SELECT id, title, is_done, created_at FROM tasks ORDER BY id;")
+        return cur.fetchall()
+    finally:
+        conn.close()
 
 # --- Ejemplo de uso
 #if __name__ == "__main__":

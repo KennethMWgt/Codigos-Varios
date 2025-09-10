@@ -9,10 +9,10 @@ def mostrar_menu():
     print("4. Crear base de datos")
     print("5. Modificar Titulo")
     print("6. Salir")
-    
+
 
 def ver_tareas():
-    tareas = get_all_tasks(conn)
+    tareas = get_all_tasks()
     if not tareas:
         print("No hay tareas.")
     else:
@@ -24,20 +24,20 @@ def ver_tareas():
 
 def agregar_tarea(nueva_tarea):
     if nueva_tarea:
-        t1 = insert_task(conn, nueva_tarea)
+        t1 = insert_task(nueva_tarea)
         print("Tarea creada con id:", t1)
     else:
         print("La tarea no puede estar vacía.")
 
 def eliminar_tarea(indice):
-    filas = delete_task(conn, indice)
+    filas = delete_task(indice)
     if filas > 0:
         print(f"Tarea '{indice}' eliminada.")
     else:
         print("Índice inválido.")
 
 def modificar_tarea(indice, title):
-    filas = update_task(conn, indice, title)
+    filas = update_task(indice, title)
     if filas > 0:
         print(f"Tarea '{indice}' modificada.")
     else:
@@ -52,8 +52,8 @@ def main():
         if opcion == "1":
             ver_tareas()
         elif opcion == "2":
-            nueva = input("Escribe la nueva tarea: ")
-            agregar_tarea(nueva)
+            nueva_tarea = input("Escribe la nueva tarea: ")
+            agregar_tarea(nueva_tarea)
         elif opcion == "3":
             ver_tareas()
             try:

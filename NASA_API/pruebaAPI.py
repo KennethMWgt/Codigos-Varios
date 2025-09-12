@@ -5,8 +5,8 @@ url = "https://api.nasa.gov/planetary/apod"
 
 # Usando la demo key
 params = {
-    "api_key": "tJ6kOjIaSirNQCcod0HSZE1h4ZTUZxgemr7PKySB",   # cambia a tu key si tienes
-    "date": "2025-09-01"     # opcional, formato YYYY-MM-DD
+    "api_key": "SHMDr37hwS4DXp2FA5Zb9Nt4aaau52Tkxel0RUXL",   # cambia a tu key si tienes
+    "date": "2025-09-09"     # opcional, formato YYYY-MM-DD
 }
 
 response = requests.get(url, params=params)

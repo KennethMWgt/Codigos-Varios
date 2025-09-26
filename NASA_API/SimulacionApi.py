@@ -17,13 +17,18 @@ def Llamada_Api(fecha):
     if response.status_code == 200:
         data = response.json()
         photos = data.get("photos",[])
-        for photo in photos: 
+        rovers = [] # datos desde la bd
+        for photo in photos:
+            nuevo_rover = {"id":  photo["rover"]["id"], "nombre": photo["rover"]["name"]}
+            if not any(rover["id"] == nuevo_rover["id"] for rover in rovers):
+                rovers.append(nuevo_rover)
             print("ID:", photo["id"])
             print("Camera:", photo["camera"]["name"])
             print("Image:", photo["img_src"])
             print("Earth Date:", photo["earth_date"])
             print("Rover:", photo["rover"]["name"])
             print("-" * 120)
+        print(rovers)
     else:
         print("Error:", response.status_code, response.text)
     

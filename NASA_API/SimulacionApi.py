@@ -22,12 +22,9 @@ def Llamada_Api(fecha):
         dbUtils_mars.create_tables()
         for photo in photos:
             nuevo_rover = {"id":  photo["rover"]["id"], "nombre": photo["rover"]["name"]}
-            if not any(rover["id"] == nuevo_rover["id"] for rover in rovers):
-                rovers.append(nuevo_rover)
-                dbUtils_mars.insert_rover(nuevo_rover["id"], nuevo_rover["nombre"])
             print("---------Photos--------")
             print("ID:", photo["id"])
-            print("Camera_ID:", photo["camera"]["id"]) 
+            print("Camera_id:", photo["camera"]["id"]) 
             print("Image:", photo["img_src"])
             print("Earth Date:", photo["earth_date"])
             print("---------Camara--------")
@@ -38,6 +35,12 @@ def Llamada_Api(fecha):
             print("ID:",photo["rover"]["id"])
             print("Rover:", photo["rover"]["name"])
             print("-" * 120)
+            if not any(rover["id"] == nuevo_rover["id"] for rover in rovers):
+                rovers.append(nuevo_rover)
+                dbUtils_mars.insert_rover(nuevo_rover["id"], nuevo_rover["nombre"])
+                dbUtils_mars.insert_camara(photo["camera"]["id"], photo["camera"]["full_name"], nuevo_rover["id"])
+            dbUtils_mars.insert_photo(photo["id"],photo["camera"]["id"],  photo["img_src"], photo["earth_date"])
+            
         print(rovers)
     else:
         print("Error:", response.status_code, response.text)

@@ -45,7 +45,7 @@ def create_tables() -> None:
         # Crear tabla Camara
         conn.execute("""
             CREATE TABLE Camara (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Full_Name TEXT NOT NULL,
                 RoverId INTEGER NOT NULL,
                 FOREIGN KEY (RoverId) REFERENCES Rover(id)
@@ -59,7 +59,7 @@ def create_tables() -> None:
                 CamaraId INTEGER NOT NULL,
                 Img_src TEXT NOT NULL,
                 Date TEXT NOT NULL,
-                FOREIGN KEY (CamaraId) REFERENCES Camara(Id)
+                FOREIGN KEY (CamaraId) REFERENCES Camara(id)
             );
         """)
         
@@ -124,11 +124,11 @@ def get_all_rovers():
 
 # === FUNCIONES PARA CAMARA ===
 
-def insert_camara(full_name: str, rover_id: int) -> int:
+def insert_camara(Camera_id: int, full_name: str, rover_id: int):
     """Inserta una cámara nueva y retorna el id generado."""
     conn = get_conn()
     try:
-        cur = conn.execute("INSERT INTO Camara (Full_Name, RoverId) VALUES (?, ?);", (full_name, rover_id))
+        cur = conn.execute("INSERT INTO Camara (id, Full_Name, RoverId) VALUES (? , ? , ?);", (Camera_id, full_name, rover_id))
         conn.commit()
         return cur.lastrowid
     finally:
@@ -136,7 +136,7 @@ def insert_camara(full_name: str, rover_id: int) -> int:
             conn.close()
 
 
-def update_camara(camara_id: int, full_name: str = None, rover_id: int = None) -> int:
+def update_camara(Camera_id: int, full_name: str = None, rover_id: int = None) -> int:
     """Actualiza una cámara. Retorna # de filas afectadas."""
     sets, params = [], []
     if full_name is not None:
@@ -149,7 +149,7 @@ def update_camara(camara_id: int, full_name: str = None, rover_id: int = None) -
     if not sets:
         return 0  # nada que actualizar
 
-    params.append(camara_id)
+    params.append(Camera_id)
     conn = get_conn()
     try:
         cur = conn.execute(f"UPDATE Camara SET {', '.join(sets)} WHERE Id = ?;", params)
@@ -160,11 +160,11 @@ def update_camara(camara_id: int, full_name: str = None, rover_id: int = None) -
             conn.close()
 
 
-def delete_camara(camara_id: int) -> int:
+def delete_camara(Camera_id: int) -> int:
     """Elimina una cámara por id. Retorna # de filas eliminadas."""
     conn = get_conn()
     try:
-        cur = conn.execute("DELETE FROM Camara WHERE Id = ?;", (camara_id,))
+        cur = conn.execute("DELETE FROM Camara WHERE Id = ?;", (Camera_id,))
         conn.commit()
         return cur.rowcount
     finally:
@@ -190,11 +190,11 @@ def get_all_camaras():
 
 # === FUNCIONES PARA PHOTOS ===
 
-def insert_photo(camara_id: int, img_src: str, date: str) -> int:
+def insert_photo(Photo_id : int,Camera_id: int, img_src: str, date: str) -> int:
     """Inserta una foto nueva y retorna el id generado."""
     conn = get_conn()
     try:
-        cur = conn.execute("INSERT INTO Photos (CamaraId, Img_src, Date) VALUES (?, ?, ?);", (camara_id, img_src, date))
+        cur = conn.execute("INSERT INTO Photos (id, CamaraId, Img_src, Date) VALUES (?, ?, ?, ?);", (Photo_id,Camera_id, img_src, date))
         conn.commit()
         return cur.lastrowid
     finally:
@@ -202,12 +202,12 @@ def insert_photo(camara_id: int, img_src: str, date: str) -> int:
             conn.close()
 
 
-def update_photo(photo_id: int, camara_id: int = None, img_src: str = None, date: str = None) -> int:
+def update_photo(photo_id: int, Camera_id: int = None, img_src: str = None, date: str = None) -> int:
     """Actualiza una foto. Retorna # de filas afectadas."""
     sets, params = [], []
-    if camara_id is not None:
+    if Camera_id is not None:
         sets.append("CamaraId = ?")
-        params.append(camara_id)
+        params.append(Camera_id)
     if img_src is not None:
         sets.append("Img_src = ?")
         params.append(img_src)
@@ -276,7 +276,7 @@ def get_photos_by_rover(rover_id: int):
             conn.close()
 
 
-def get_photos_by_camara(camara_id: int):
+def get_photos_by_camara(Camera_id: int):
     """Obtiene todas las fotos de una cámara específica."""
     conn = get_conn()
     try:
@@ -287,7 +287,7 @@ def get_photos_by_camara(camara_id: int):
             JOIN Rover r ON c.RoverId = r.id 
             WHERE c.Id = ?
             ORDER BY p.id;
-        """, (camara_id,))
+        """, (Camera_id,))
         return cur.fetchall()
     finally:
         if _should_close_conn(conn):

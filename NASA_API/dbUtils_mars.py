@@ -72,11 +72,11 @@ def create_tables() -> None:
 
 # === FUNCIONES PARA ROVER ===
 
-def insert_rover(name: str) -> int:
+def insert_rover(rover_id: int , name: str):
     """Inserta un rover nuevo y retorna el id generado."""
     conn = get_conn()
     try:
-        cur = conn.execute("INSERT INTO Rover (Name) VALUES (?);", (name,))
+        cur = conn.execute("INSERT INTO Rover (id , Name) VALUES (?,?);", (rover_id , name,))
         conn.commit()
         return cur.lastrowid
     finally:

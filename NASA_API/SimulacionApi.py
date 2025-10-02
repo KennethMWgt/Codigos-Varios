@@ -1,5 +1,6 @@
 from datetime import datetime
 import requests
+import dbUtils_mars
 
 def mostrar_menu():
     print("\n--- Menú de Tareas ---")
@@ -18,14 +19,23 @@ def Llamada_Api(fecha):
         data = response.json()
         photos = data.get("photos",[])
         rovers = [] # datos desde la bd
+        dbUtils_mars.create_tables()
         for photo in photos:
             nuevo_rover = {"id":  photo["rover"]["id"], "nombre": photo["rover"]["name"]}
             if not any(rover["id"] == nuevo_rover["id"] for rover in rovers):
                 rovers.append(nuevo_rover)
+                dbUtils_mars.insert_rover(nuevo_rover["id"], nuevo_rover["nombre"])
+            print("---------Photos--------")
             print("ID:", photo["id"])
-            print("Camera:", photo["camera"]["name"])
+            print("Camera_ID:", photo["camera"]["id"]) 
             print("Image:", photo["img_src"])
             print("Earth Date:", photo["earth_date"])
+            print("---------Camara--------")
+            print("ID:", photo["camera"]["id"])
+            print("Camera:", photo["camera"]["full_name"])
+            print("Rover_ID:",photo["rover"]["id"])
+            print("---------Rover--------")
+            print("ID:",photo["rover"]["id"])
             print("Rover:", photo["rover"]["name"])
             print("-" * 120)
         print(rovers)

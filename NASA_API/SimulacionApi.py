@@ -19,6 +19,7 @@ def Llamada_Api(fecha):
         data = response.json()
         photos = data.get("photos",[])
         rovers = [] # datos desde la bd
+        cameras = [] # datos desde la bd
         dbUtils_mars.create_tables()
         for photo in photos:
             nuevo_rover = {"id":  photo["rover"]["id"], "nombre": photo["rover"]["name"]}
@@ -38,6 +39,8 @@ def Llamada_Api(fecha):
             if not any(rover["id"] == nuevo_rover["id"] for rover in rovers):
                 rovers.append(nuevo_rover)
                 dbUtils_mars.insert_rover(nuevo_rover["id"], nuevo_rover["nombre"])
+            if not any(camara["id"] == photo["camera"]["id"] for camara in cameras):
+                cameras.append({"id": photo["camera"]["id"]})
                 dbUtils_mars.insert_camara(photo["camera"]["id"], photo["camera"]["full_name"], nuevo_rover["id"])
             dbUtils_mars.insert_photo(photo["id"],photo["camera"]["id"],  photo["img_src"], photo["earth_date"])
             

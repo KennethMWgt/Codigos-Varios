@@ -241,7 +241,7 @@ def delete_photo(photo_id: int) -> int:
             conn.close()
 
 
-def get_all_photos():
+def get_all_photos(fecha: str):
     """Obtiene todas las fotos con información de la cámara y rover."""
     conn = get_conn()
     try:
@@ -250,8 +250,9 @@ def get_all_photos():
             FROM Photos p 
             JOIN Camara c ON p.CamaraId = c.Id 
             JOIN Rover r ON c.RoverId = r.id 
+            WHERE p.Date = ?
             ORDER BY p.id;
-        """)
+        """, (fecha,))
         return cur.fetchall()
     finally:
         if _should_close_conn(conn):

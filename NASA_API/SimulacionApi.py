@@ -6,7 +6,8 @@ def mostrar_menu():
     print("\n--- Menú de Tareas ---")
     print("1. Generar Informacion")
     print("2. Extraer Json")
-    print("3. Salir")
+    print("3. Crear Base de Datos")
+    print("4. Salir")
     
 def Llamada_Api(fecha):
     url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos"
@@ -18,12 +19,13 @@ def Llamada_Api(fecha):
     if response.status_code == 200:
         data = response.json()
         photos = data.get("photos",[])
-        rovers = [] # datos desde la bd
+        rovers = dbUtils_mars.get_all_rovers() # datos desde la bd
         cameras = [] # datos desde la bd
-        dbUtils_mars.create_tables()
+        for rover in rovers:
+            print("ID: ",rover[0],"Nombre: ",rover[1])
         for photo in photos:
             nuevo_rover = {"id":  photo["rover"]["id"], "nombre": photo["rover"]["name"]}
-            print("---------Photos--------")
+            """print("---------Photos--------")
             print("ID:", photo["id"])
             print("Camera_id:", photo["camera"]["id"]) 
             print("Image:", photo["img_src"])
@@ -35,8 +37,8 @@ def Llamada_Api(fecha):
             print("---------Rover--------")
             print("ID:",photo["rover"]["id"])
             print("Rover:", photo["rover"]["name"])
-            print("-" * 120)
-            if not any(rover["id"] == nuevo_rover["id"] for rover in rovers):
+            print("-" * 120)"""
+            if not any(rover[0] == nuevo_rover["id"] for rover in rovers):
                 rovers.append(nuevo_rover)
                 dbUtils_mars.insert_rover(nuevo_rover["id"], nuevo_rover["nombre"])
             if not any(camara["id"] == photo["camera"]["id"] for camara in cameras):
@@ -63,11 +65,20 @@ def main():
             except ValueError:
                 print("Fecha inválida. Asegúrese de usar el formato correcto (Año-Mes-Día) y que sea una fecha real.")
             
-        #elif opcion == "2":
-            #nueva_tarea = input("Escribe la nueva tarea: ")
-            #agregar_tarea(nueva_tarea)
-        
+        elif opcion == "2":
+            fecha = input("Ingrese la fecha para extraer la información (Formato: Año-Mes-Día): ")
+            try:
+                fecha_valida = datetime.strptime(fecha, "%Y-%m-%d")
+                print("Fecha válida:", fecha_valida.date())
+                photos = dbUtils_mars.get_all_photos(fecha_valida.date())
+                for photo in photos:
+                    print(photo)                
+            except ValueError:
+                print("Fecha inválida. Asegúrese de usar el formato correcto (Año-Mes-Día) y que sea una fecha real.") 
         elif opcion == "3":
+             dbUtils_mars.create_tables()
+            
+        elif opcion == "4":
             print("¡Hasta luego!")
             break
         else:
